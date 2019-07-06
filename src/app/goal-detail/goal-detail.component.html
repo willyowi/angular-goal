@@ -1,4 +1,6 @@
 <p>{{goal.description}}</p>
-<p>This goal will be complete in {{goal.completeDate|dateCount}} days</p>
-<button class="btn btn-outline-danger" (click)= 'goalDelete(true)'>Delete Goal</button>
+<p>Quote was published {{goal.completeDate|dateCount}} days ago</p>
+<button class="btn btn-outline-danger" (click)= 'goalDelete(true)'>Delete</button>
+<app-vote></app-vote>
+
 
