@@ -1,21 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { Goal } from '../goal';
+import {Goals} from '../goals'
+import {GoalService} from '../goals/goal.service';
+import {AlertsService} from '../alert-service/alerts.service';
+import {Quote} from '../quote-class/quote';
+import {HttpClient} from '@angular/common/http'
+import {QuoteRequestService} from '../quote-http/quote-request.service'
+
+
+
+
 
 @Component({
   selector: 'app-goal',
   templateUrl: './goal.component.html',
-  styleUrls: ['./goal.component.css']
+  styleUrls: ['./goal.component.css'],
+  providers:[GoalService,QuoteRequestService] //add the providers to the component
+
+
 })
-export class GoalComponent implements OnInit {
-  goals: Goal[] = [
-    new Goal(1, 'Kevin heart', 'I DON’T have EX’s! I have Y’s. Like ‘Y the hell did I date you?!’',new Date(2018,6,14)),
-    new Goal(2,'Buy Cookies','I have to buy cookies for the parrot',new Date(2019,4,9)),
-    new Goal(3,'Get new Phone Case','Diana has her birthday coming up soon',new Date(2019,6,1)),
-    new Goal(4,'Get Dog Food','Pupper likes expensive snacks',new Date(2019,3,23)),
-    new Goal(5,'Solve math homework','Damn Math',new Date(2019,1,21)),
-    new Goal(6,'Plot my world domination plan','Cause I am an evil overlord',new Date(2018,8,6)),
-  ];
-  toggleDetails(index){
+
+  export class GoalComponent implements OnInit {
+    goals = Goals;
+    quote:Quote;
+    alertService:AlertsService;
+  
+    toggleDetails(index){
    this.goals[index].showDescription = !this.goals[index].showDescription;
  }
  addNewGoal(goal){
@@ -30,18 +40,44 @@ export class GoalComponent implements OnInit {
     this.goals.splice(index,1);
   }
 }
-deleteGoal(isComplete, index){
-  if (isComplete) {
-    let toDelete = confirm(`Are you sure you want to delete ${this.goals[index].name}?`)
+deleteGoal(isComplete,index){
+  if (isComplete){
 
-    if (toDelete){
-      this.goals.splice(index,1)
-    }
+      let toDelete=confirm(` Oyah! Tupeleke na Rieng ka unadai tuchuje "${this.goals[index].name}" na  ujue tukiichuja ni ivo joh`)
+
+      if(toDelete){
+          this.goals.splice(index,1)
+          this.alertService.alertMe("wazi joh ..isha Go")
+
+      }
+
   }
 }
-  constructor() { }
+constructor(goalService:GoalService,alertService:AlertsService,privatequoteService:QuoteRequestService,private http:HttpClient) {
+  this.goals = goalService.getGoals();
+  this.alertService = alertService;//make the service available to the class
+   }
 
-  ngOnInit() {
+
+
+
+  ngOnInit() { 
+    
+    interface ApiResponse{
+      quote:string;
+      author:string
   }
 
+  
+    this.http.get<ApiResponse>("http://quotes.stormconsultancy.co.uk/random.json").subscribe(data=>{
+      this.quote= new Quote(data.quote,data.author),err=>{
+        this.quote= new Quote("Never, never, never give up.","winston churchill")
+        console.log("Error occured ")
+      }
+
+})
+
+  
+  }
 }
+
